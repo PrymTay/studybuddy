@@ -1,22 +1,31 @@
-from django.shortcuts import render
-
+from django.http.response import HttpResponse
+from django.shortcuts import redirect, render
+from django.db.models import Q
+from django.contrib.auth.models import User
 from templates.forms import roomform
-from .models import Rooms
+from .models import Rooms, Topic
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+
+from django.contrib import messages
 
 # Create your views here.
 
-rooms= [
-    {'id':1,"name":"django"},
-     {'id':2,"name":"python"},
-      {'id':3,"name":"java"},
-       {'id':4,"name":"C++"},
-]
-
-
 
 def home(request):
-    rooms = Rooms.objects.all()
-    context = {"rooms":rooms}
+    # use the get (request method) and the get(method--models get method haha funny)
+    # 'query' is the one appended in the url
+    query = request.GET.get('query')  if request.GET.get('query') != None else ''
+    rooms = Rooms.objects.filter(
+        Q(topic__title__icontains=query)|
+        Q(description__icontains=query)
+         # Q(host__icontains=query)
+        )  #contains - if serach has any similar character, 
+           #i - for case insensitive __ - just the way we are adding it to the model search
+    topics = Topic.objects.all()
+
+    room_count = rooms.count() # getting the number of rooms returned from the search. and its faster than .len()
+    context = {"rooms":rooms,"topics":topics ,"room_count":room_count }
     return render(request,'index.html',context)
 
 def room(request, pk ):
@@ -24,7 +33,74 @@ def room(request, pk ):
     context = {"rooms":rooms}
     return render(request,'room.html', context)
 
+@login_required(login_url='login')
 def create_room(request):
     form = roomform()
+    if request.method == 'POST':
+        form = roomform(request.POST)
+        if form.is_valid:
+            form.save()
+            return redirect('home')
+        
     context = {"form":form}
-    return render(request,'room_form.html' ,context)
+    return render(request,'room_form.html',context)
+
+@login_required(login_url='login')
+def update_room(request,pk):
+    rooms = Rooms.objects.get(id=pk)
+    form = roomform(instance=rooms)
+
+    #ensuring that only eh room ownwer can edit that room
+    if request.user != rooms.host:
+        return HttpResponse("It's rude to edit other people's rooms!!!")
+
+    if request.method == 'POST':
+        form = roomform(request.POST, instance=rooms) #to make sure that we are updating that particular room details
+        if form.is_valid:
+            form.save()
+            return redirect('home')
+    context = {'form':form}
+    return render(request,'room_form.html',context)
+
+@login_required(login_url='login')
+def delete_room(request, pk):
+    room = Rooms.objects.get(id=pk)
+
+ #ensuring that only the room ownwer can delet that room
+    if request.user != room.host:
+        return HttpResponse("It's rude to delete other people's rooms!!!")
+
+    if request.method == 'POST':
+        room.delete()
+        return redirect('home')
+    return render(request,'delete.html',{'object':room})  
+
+def login_page(request):
+    page = 'login'
+    #stopping an already logged in user from logging in again.
+    if request.user.is_authenticated:
+        return redirect('home')
+
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        try:
+            user = User.objects.get(username=username)
+        except:
+            messages.error(request,'User does not exist')
+
+        user = authenticate(request,username=username,password=password)
+
+        if user is not None:
+            login(request,user)
+            return redirect('home')
+        else:
+            messages.error(request,'Invalid credentials')
+
+    context = {"page":page}
+    return render(request,'login_register.html',context)
+
+def logout_user(request):
+    logout(request)
+    return redirect('home')

@@ -13,6 +13,10 @@ class Rooms(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     created_At = DateTimeField(auto_now_add=True) #takes timestamp at creation only
 
+    
+    class Meta:
+        ordering = ['-updated_at','-created_At']  #ensure that the most recent room appears at the top
+
     def __str__(self):
         return self.name
 
@@ -32,6 +36,8 @@ class message(models.Model):
 
     def __str__(self):
         return self.body[0:50]
+
+
 
      
 
