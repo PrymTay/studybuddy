@@ -9,6 +9,7 @@ class Rooms(models.Model):
     host = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     topic =  models.ForeignKey('Topic', on_delete=models.SET_NULL, null=True) #'' around Topic cause topic is below and not above the room classs
     name = models.CharField(max_length=20)
+    participants = models.ManyToManyField(User,related_name='participants', blank=True)
     description = models.TextField()
     updated_at = models.DateTimeField(auto_now=True)
     created_At = DateTimeField(auto_now_add=True) #takes timestamp at creation only
@@ -26,13 +27,13 @@ class Topic(models.Model):
     def __str__(self):
         return self.title
 
-class message(models.Model):
+class Message(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     room = models.ForeignKey(Rooms, on_delete=models.CASCADE)
     body = models.TextField()
     updated_at = models.DateTimeField(auto_now=True)
-    created_At = DateTimeField(auto_now_add=True) #takes timestamp at creation only
+    created_at = DateTimeField(auto_now_add=True) #takes timestamp at creation only
 
     def __str__(self):
         return self.body[0:50]

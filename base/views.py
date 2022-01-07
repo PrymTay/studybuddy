@@ -3,9 +3,10 @@ from django.shortcuts import redirect, render
 from django.db.models import Q
 from django.contrib.auth.models import User
 from templates.forms import roomform
-from .models import Rooms, Topic
+from .models import Rooms, Topic, Message
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
 
 from django.contrib import messages
 
@@ -30,7 +31,16 @@ def home(request):
 
 def room(request, pk ):
     rooms = Rooms.objects.get(id=pk)
-    context = {"rooms":rooms}
+    room_messages = rooms.message_set.all().order_by('created_at')# this gives the children of that model... basically you just get the model name, in lower caps(so messages instead of Messages)
+    
+    if request.method == 'POST':
+        message = Message.objects.create(
+            user=request.user,
+            room = rooms,
+            body=request.POST.get('body')
+        )
+        return redirect('room',pk)
+    context = {"rooms":rooms,"room_messages":room_messages}
     return render(request,'room.html', context)
 
 @login_required(login_url='login')
@@ -50,7 +60,7 @@ def update_room(request,pk):
     rooms = Rooms.objects.get(id=pk)
     form = roomform(instance=rooms)
 
-    #ensuring that only eh room ownwer can edit that room
+    #ensuring that only the  room ownwer can edit that room
     if request.user != rooms.host:
         return HttpResponse("It's rude to edit other people's rooms!!!")
 
@@ -82,7 +92,7 @@ def login_page(request):
         return redirect('home')
 
     if request.method == 'POST':
-        username = request.POST.get('username')
+        username = request.POST.get('username').lower()
         password = request.POST.get('password')
 
         try:
@@ -104,3 +114,18 @@ def login_page(request):
 def logout_user(request):
     logout(request)
     return redirect('home')
+
+def register_user(request):
+    form = UserCreationForm
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)  #we want to be able to access the form
+            user.username = user.username.lower()
+            user.save()
+            login(request,user)
+            return redirect('home')
+        else:
+            messages.error(request,'An error occured during registration')
+    context = {'form':form}
+    return render(request,'login_register.html',context)
