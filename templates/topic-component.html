@@ -1,9 +1,15 @@
-<p>Browse Topics</p>
-<hr />
+
 <a href="{% url 'home' %}">All</a>
 
 {% for topic in topics %}
 <div>
-  <a href="{% url 'home' %}?query={{ topic.title }} ">{{ topic.title }}</a>
+   <ul class="topics__list">
+            
+            <li>
+              <a href="{% url 'home' %}?query={{ topic.title }} ">{{ topic.title }}</a><span>{{ room_count }}</span>
+            </li>
+           
+          </ul> 
+
 </div>
 {% endfor %}

@@ -18,6 +18,7 @@ def home(request):
     # 'query' is the one appended in the url
     query = request.GET.get('query') if request.GET.get(
         'query') != None else ''
+    therooms = Rooms.objects.all()
     rooms = Rooms.objects.filter(
         Q(topic__title__icontains=query) |
         Q(description__icontains=query)
@@ -25,6 +26,9 @@ def home(request):
     )  # contains - if serach has any similar character,
     # i - for case insensitive __ - just the way we are adding it to the model search
     topics = Topic.objects.all()
+    # topicsperroom = therooms.rooms_set.all()
+    # print(topicsperroom)
+    # count = topicsperroom.count()
 
     # getting the number of rooms returned from the search. and its faster than .len()
     room_count = rooms.count()
@@ -177,7 +181,7 @@ def login_page(request):
             messages.error(request, 'Invalid credentials')
 
     context = {"page": page}
-    return render(request, 'login_register.html', context)
+    return render(request,'login_register.html', context)
 
 
 def logout_user(request):

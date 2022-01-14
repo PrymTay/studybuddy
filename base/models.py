@@ -12,11 +12,11 @@ class Rooms(models.Model):
     participants = models.ManyToManyField(User,related_name='participants', blank=True)
     description = models.TextField()
     updated_at = models.DateTimeField(auto_now=True)
-    created_At = DateTimeField(auto_now_add=True) #takes timestamp at creation only
+    created_at = DateTimeField(auto_now_add=True) #takes timestamp at creation only
 
     
     class Meta:
-        ordering = ['-updated_at','-created_At']  #ensure that the most recent room appears at the top
+        ordering = ['-updated_at','-created_at']  #ensure that the most recent room appears at the top
 
     def __str__(self):
         return self.name
