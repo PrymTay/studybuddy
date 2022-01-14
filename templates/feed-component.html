@@ -1,0 +1,22 @@
+{% if room_count == 0 %}
+<p>You are not subcribed to any room!!</p>
+<a href = "{% url 'create_room' %}">Create own</a> or <a href="#">Join one</a>
+{% endif %}
+{% for room in rooms %}
+<div>
+  <!-- #Hiding delete and edit links form non room owners -->
+
+  {% if request.user == room.host %}
+  <a href="{% url 'update_room' room.id %}">Edit</a> <br />
+  <a href="{% url 'delete_room' room.id %}">Delete</a><br />
+  {% endif %}
+
+  <span><a href="{% url 'user-profile' room.host.id  %}" >{{ room.host.username }} </a></span>
+
+  <h5>
+    {{ room.id }} :: <a href="{% url 'room' room.id %}"> {{ room.name }}</a>
+  </h5>
+  <small>{{ room.topic.title }}</small>
+  <hr />
+</div>
+{% endfor %}  

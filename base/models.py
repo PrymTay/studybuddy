@@ -31,9 +31,13 @@ class Message(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     room = models.ForeignKey(Rooms, on_delete=models.CASCADE)
-    body = models.TextField()
+    body = models.TextField( )
     updated_at = models.DateTimeField(auto_now=True)
     created_at = DateTimeField(auto_now_add=True) #takes timestamp at creation only
+
+
+    class Meta:
+        ordering = ['-updated_at','-created_at']  #ensure that the most recent message appears at the top
 
     def __str__(self):
         return self.body[0:50]
