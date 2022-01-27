@@ -83,7 +83,7 @@
                 <p>Hosted By</p>
                 <a href="{% url 'user-profile' rooms.host.id %}" class="room__author">
                   <div class="avatar avatar--small">
-                    <img src="https://randomuser.me/api/portraits/men/37.jpg" />
+                    <!-- <img src="https://randomuser.me/api/portraits/men/37.jpg" /> -->
                   </div>
                   <span>{{ rooms.host }}</span>
                 </a>
@@ -184,7 +184,7 @@
 
         <!--   Start -->
         <div class="participants">
-          <h3 class="participants__top">Participants <span>(5.3k Joined)</span></h3>
+          <h3 class="participants__top">Participants <span>{{ p_count }}</span></h3>
           <div class="participants__list scroll">
             
             {% for user in participants %}

@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-8zdo^r4#&qes)w%-8xl0!0e9=%gkjcay4va9bkv7d-1g1fn)l=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.1.25']
 
 
 # Application definition
@@ -80,8 +80,10 @@ WSGI_APPLICATION = 'studyBuddy.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE':'django.db.backends.postgresql_psycopg2',
+        # 'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME' : '',
     }
 }
 

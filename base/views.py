@@ -1,7 +1,10 @@
+
 from django.http.response import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.db.models import Q
 from django.contrib.auth.models import User
+from django.template import context
+from django.urls import reverse_lazy
 from templates.forms import messageform, roomform
 from .models import Rooms, Topic, Message
 from django.contrib.auth import authenticate, login, logout
@@ -12,6 +15,15 @@ from django.contrib import messages
 
 # Create your views here.
 
+def topic_count(request):
+     query = request.GET.get('query') if request.GET.get(
+        'query') != None else ''
+     topics = Topic.objects.filter(Q(title__icontains=query))
+     topic_count = topics.count()
+      
+     context = {"topic_count":topic_count}
+     print(context)
+     return render(request,'topic-component.html',context)
 
 def home(request):
     # use the get (request method) and the get(method--models get method haha funny)
@@ -30,8 +42,11 @@ def home(request):
     # print(topicsperroom)
     # count = topicsperroom.count()
 
+
+    topics = Topic.objects.filter(Q(title__icontains=query))
+    room_count = topics.count()
     # getting the number of rooms returned from the search. and its faster than .len()
-    room_count = rooms.count()
+    #room_count = rooms.count()
     room_messages = Message.objects.filter(Q(room__topic__title__icontains=query))[0:5] #limiting the number of object returned and adding a filter 
     context = {"rooms": rooms, "topics": topics, "room_count": room_count,"room_messages":room_messages}
     return render(request, 'index.html', context)
@@ -54,6 +69,7 @@ def room(request, pk):
     # this gives the children of that model... basically you just get the model name, in lower caps(so messages instead of Messages)
     room_messages = rooms.message_set.all().order_by('created_at')
     participants = rooms.participants.all()
+    p_count = participants.count()
    
     if request.method == 'POST':
        
@@ -66,7 +82,7 @@ def room(request, pk):
         rooms.participants.add(request.user)
         return redirect('room', pk=rooms.id)
     context = {"rooms": rooms, "room_messages": room_messages,
-               "participants": participants}
+               "participants": participants,'p_count':p_count}
     return render(request, 'room.html', context)
 
 
@@ -158,7 +174,7 @@ def delete_message(request, pk):
 
 
 def login_page(request):
-    page = 'login'
+    #page = 'login'
     # stopping an already logged in user from logging in again.
     if request.user.is_authenticated:
         return redirect('home')
@@ -180,8 +196,8 @@ def login_page(request):
         else:
             messages.error(request, 'Invalid credentials')
 
-    context = {"page": page}
-    return render(request,'login_register.html', context)
+    #context = {"page": page}
+    return render(request,'login_register.html')
 
 
 def logout_user(request):
@@ -191,17 +207,23 @@ def logout_user(request):
 
 def register_user(request):
     form = UserCreationForm
+    success_url = reverse_lazy('login')
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
             # we want to be able to access the form
             user = form.save(commit=False)
+            user.firstname = user.firstname.lower()
+            user.lastname = user.lastname.lower()
             user.username = user.username.lower()
             user.save()
             login(request, user)
             return redirect('home')
         else:
             messages.error(request, 'An error occured during registration')
+
+    else:
+        messages.error(request, 'Not a post request')
     context = {'form': form}
-    return render(request, 'login_register.html', context)
+    return render(request, 'signup.html', context)
 
