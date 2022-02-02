@@ -26,8 +26,8 @@ SECRET_KEY = 'django-insecure-8zdo^r4#&qes)w%-8xl0!0e9=%gkjcay4va9bkv7d-1g1fn)l=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.1.25']
-
+#ALLOWED_HOSTS = ['192.168.1.25','127.0.0.1','localhost:8000']
+ALLOWED_HOSTS =['*']
 
 # Application definition
 
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     #local apps
 
     'base',
+    'social_django',
 ]
 
 MIDDLEWARE = [
@@ -52,6 +53,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'social_django.middleware.SocialAuthExceptionMiddleware', #added middleware for the social media authentication
 ]
 
 ROOT_URLCONF = 'studyBuddy.urls'
@@ -67,6 +70,10 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
+                'social_django.context_processors.backends',  # this contains permissions that allow us to access data from the
+                                                                #applications.
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -108,6 +115,44 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# authentication backends to handle the authentication using social media
+AUTHENTICATION_BACKENDS = [
+    'social_core.backends.github.GithubOAuth2',
+    'social_core.backends.linkedin.LinkedinOAuth2',
+    'social_core.backends.instagram.InstagramOAuth2',
+    'social_core.backends.facebook.FacebookOAuth2',
+    'django.contrib.auth.backends.ModelBackend',       #this is the default
+]
+
+
+# [...]
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_URL = 'logout_user'
+LOGOUT_REDIRECT_URL = 'login'
+
+#[...]
+
+# For the linkedin log in
+SOCIAL_AUTH_LINKEDIN_OAUTH2_KEY = '86ybscdzt8gfnb'       # Client ID
+SOCIAL_AUTH_LINKEDIN_OAUTH2_SECRET = 'ag9H3RojqeZNGihg' # Client Secret
+SOCIAL_AUTH_LINKEDIN_OAUTH2_SCOPE = ['r_basicprofile', 'r_emailaddress']
+SOCIAL_AUTH_LINKEDIN_OAUTH2_FIELD_SELECTORS = ['email-address', 'formatted-name', 'public-profile-url', 'picture-url']
+SOCIAL_AUTH_LINKEDIN_OAUTH2_EXTRA_DATA = [
+    ('id', 'id'),
+    ('formattedName', 'name'),
+    ('emailAddress', 'email_address'),
+    ('pictureUrl', 'picture_url'),
+    ('publicProfileUrl', 'profile_url'),
+]
+
+#[...]
+
+SOCIAL_AUTH_GITHUB_KEY = '9e7f65898933b6a9996c'
+SOCIAL_AUTH_GITHUB_SECRET = 'ca9b284df501a1c07a4b9bc0078dd6373bb54261'
+
 
 
 # Internationalization

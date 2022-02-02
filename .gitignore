@@ -1,0 +1,6 @@
+# Project files and directories
+studyBuddy/studyBuddy/settings.py
+
+#environments
+.env
+

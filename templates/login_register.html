@@ -10,6 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="{% static 'styles/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'styles/socials.css' %}" />
     <title>StudyBuddy - Find study partners around the world!</title>
   </head>
   <body>
@@ -144,7 +145,24 @@
                 Login
               </button>
             </form>
-
+            <div class="separator">OR</div>
+            <div class="row">
+              <div class="col-md-6 ">
+                  <button class="btn btn-danger mb-2">
+                      <!-- <a href="#">Login with Instagram</a> -->
+                      <a href="{% url 'social:begin' 'github' %}"><i class="bi bi-github"></i></a>
+                  </button>
+                  <button class="btn btn-primary mb-2">
+                      <!-- <a href="#">Login with Facebook
+                      </a> -->
+                      <a href="#"><i class="bi bi-facebook"></i></a>
+                  </button>
+                  <button class="btn btn-info mb-2">
+                      <!-- <a href="#">Login with LinkedIn</a> -->
+                      <a href="{% url 'social:begin' 'linkedin-oauth2' %}"><i class="bi bi-linkedin"></i></a>
+                  </button>
+              </div>
+          </div>
             <div class="auth__action">
               <p>Haven't signed up yet?</p>
               <a href="{% url 'register' %}" class="btn btn--link">Sign Up</a>

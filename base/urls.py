@@ -1,5 +1,5 @@
 
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 urlpatterns = [
@@ -7,6 +7,7 @@ urlpatterns = [
     path('login/',views.login_page,name='login'),
     path('logout/',views.logout_user,name='logout_user'),
     path('register/',views.register_user,name='register'),
+  #  path('social-auth/', include('social_django.urls', namespace="social")), # add the social-auth-django-app urls here
     path('',views.home, name='home' ),
     path('room/<str:pk>',views.room, name='room' ),
     path('create',views.create_room,name='create_room'),
